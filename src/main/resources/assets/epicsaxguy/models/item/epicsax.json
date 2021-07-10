@@ -76,6 +76,60 @@
 				"epicsaxguy:loading": 11
 			},
 			"model": "epicsaxguy:item/epicsax_loading_11"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 12
+			},
+			"model": "epicsaxguy:item/epicsax_using_0"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 13
+			},
+			"model": "epicsaxguy:item/epicsax_using_1"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 14
+			},
+			"model": "epicsaxguy:item/epicsax_using_2"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 15
+			},
+			"model": "epicsaxguy:item/epicsax_using_3"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 16
+			},
+			"model": "epicsaxguy:item/epicsax_using_4"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 17
+			},
+			"model": "epicsaxguy:item/epicsax_using_5"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 18
+			},
+			"model": "epicsaxguy:item/epicsax_using_6"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 19
+			},
+			"model": "epicsaxguy:item/epicsax_using_7"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 20
+			},
+			"model": "epicsaxguy:item/epicsax_using_8"
 		}
 	]
 }

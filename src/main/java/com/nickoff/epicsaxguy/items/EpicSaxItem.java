@@ -27,7 +27,10 @@ import java.util.List;
 
 public class EpicSaxItem extends Item {
 
-    private static int MAX_STEPS = 11;
+    private static final int STEPS_UNTIL_USE = 11;
+    private static final int USE_ANIM_START = 12;
+    private static final int MAX_STEPS = 20;
+
     private int step = 0;
     private long lastTick = 0;
 
@@ -60,8 +63,10 @@ public class EpicSaxItem extends Item {
                 step = 0;
             }
             else {
-                if (step <= MAX_STEPS)
-                step += 1;
+                if (step < MAX_STEPS)
+                    step += 1;
+                else if (step == MAX_STEPS)
+                    step = USE_ANIM_START;
             }
 
         if (player instanceof PlayerEntity)
@@ -76,7 +81,7 @@ public class EpicSaxItem extends Item {
      * **/
     private void useSax(World level, PlayerEntity player, ItemStack stack)
     {
-        if (step >= MAX_STEPS)
+        if (step >= STEPS_UNTIL_USE)
         {
             if (level.isClientSide()) {
                 instantiateSound();
