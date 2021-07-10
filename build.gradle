@@ -13,8 +13,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0.0'
-group = 'com.nickoff.randomarrows' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'randomarrows'
+group = 'com.nickoff.epicsaxguy' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'epicsaxguy'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
@@ -55,7 +55,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                chunkdestroyertools {
+                epicsaxguy {
                     source sourceSets.main
                 }
             }
@@ -77,7 +77,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                chunkdestroyertools {
+                epicsaxguy {
                     source sourceSets.main
                 }
             }
@@ -99,10 +99,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'chunkdestroyertools', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'epicsaxguy', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                chunkdestroyertools {
+                epicsaxguy {
                     source sourceSets.main
                 }
             }
@@ -143,7 +143,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "randomarrows",
+            "Specification-Title": "epicsaxguy",
             "Specification-Vendor": "Nickoff",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
