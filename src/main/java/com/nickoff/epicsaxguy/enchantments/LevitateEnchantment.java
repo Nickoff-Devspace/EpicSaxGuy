@@ -1,5 +1,5 @@
 package com.nickoff.epicsaxguy.enchantments;
-import net.minecraft.block.Blocks;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;

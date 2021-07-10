@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "gg ",
+        " gg",
+        " gg"
+    ],
+    "key": {
+        "g": {
+            "item": "minecraft:gold_ingot"
+        }
+    },
+    "result": {
+        "item": "epicsaxguy:epicsax",
+        "count": 1
+    }
+}

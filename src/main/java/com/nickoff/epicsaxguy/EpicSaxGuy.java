@@ -2,8 +2,6 @@ package com.nickoff.epicsaxguy;
 
 import com.nickoff.epicsaxguy.inits.Init;
 import net.minecraft.block.Block;
-import net.minecraft.data.ItemModelProvider;
-import net.minecraft.item.ItemModelsProperties;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,6 +15,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file

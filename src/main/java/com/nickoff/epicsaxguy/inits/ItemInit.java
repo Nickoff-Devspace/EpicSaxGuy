@@ -1,8 +1,7 @@
 package com.nickoff.epicsaxguy.inits;
 
 import com.nickoff.epicsaxguy.EpicSaxGuy;
-import com.nickoff.epicsaxguy.items.*;
-import net.minecraft.item.IItemPropertyGetter;
+import com.nickoff.epicsaxguy.items.EpicSaxItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;

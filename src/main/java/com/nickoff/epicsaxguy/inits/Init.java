@@ -1,7 +1,6 @@
 package com.nickoff.epicsaxguy.inits;
 
 import com.nickoff.epicsaxguy.EpicSaxGuy;
-import net.minecraft.client.audio.Sound;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.SoundEvent;
