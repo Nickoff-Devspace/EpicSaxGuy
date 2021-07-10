@@ -1,5 +1,6 @@
 package com.nickoff.epicsaxguy.items;
 
+import com.nickoff.epicsaxguy.inits.EnchantmentInit;
 import com.nickoff.epicsaxguy.inits.ItemInit;
 import com.nickoff.epicsaxguy.inits.SoundInit;
 import net.minecraft.block.BlockState;
@@ -38,6 +39,7 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.extensions.IForgeBakedModel;
 import net.minecraftforge.common.model.animation.AnimationStateMachine;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -56,20 +58,11 @@ public class EpicSaxItem extends Item {
 
     private TickableSound sound;
 
-    private int range;
-    private boolean explode;
-    private boolean ignite;
-    private boolean levitation;
-    private boolean slowness;
+    private static final int defaultRange = 3;
 
     public EpicSaxItem() {
         super((new Properties()).stacksTo(1).tab(ItemGroup.TAB_COMBAT));
         sound = null;
-        range = 3;
-        explode = false;
-        ignite = false;
-        levitation = false;
-        slowness = false;
     }
 
     /** Fired once every 4 ticks **/
@@ -81,7 +74,7 @@ public class EpicSaxItem extends Item {
     }
 
     /** Just used as trick to get loop without subscribing an event
-     * Calculates when epic sax should be executing or not */
+     * Calculates when epic sax procedure should be executing or not */
     @Override
     public void inventoryTick(ItemStack stack, World level, Entity player, int ticks, boolean p_77663_5_) {
         if (!level.isClientSide())
@@ -92,8 +85,6 @@ public class EpicSaxItem extends Item {
                 step = 0;
             }
             else {
-                if (EnchantmentHelper.getFireAspect(((LivingEntity) player)) == 0)
-                    stack.enchant(Enchantments.FIRE_ASPECT, 1);
                 if (step <= MAX_STEPS)
                 step += 1;
             }
@@ -104,7 +95,7 @@ public class EpicSaxItem extends Item {
         super.inventoryTick(stack, level, player, ticks, p_77663_5_);
     }
 
-    /** Starts the killing procedure if the sax animation is completed
+    /** Starts the sax procedure if the sax animation is completed
      * @param level the world it is gonna scan for entities
      * @param player the player it is gonna be used to take the starting scan position
      * **/
@@ -119,21 +110,34 @@ public class EpicSaxItem extends Item {
             }
             else
             {
+                int range = defaultRange;
+                if (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.MEGA_RANGE.get(), (LivingEntity) player) > 0)
+                    range = 120;
+                else
+                    range *= (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.RANGE.get(),
+                        (LivingEntity) player)+1);
+
                 BlockPos cornerA = new BlockPos(player.getPosition(0));
-                BlockPos cornerB = new BlockPos(cornerA.getX()+3, cornerA.getY()+3, cornerA.getZ()+3);
-                cornerA = new BlockPos(cornerA.getX() -3, cornerA.getY()-3, cornerA.getZ()-3);
+                BlockPos cornerB = new BlockPos(cornerA.getX()+range, cornerA.getY()+range, cornerA.getZ()+range);
+                cornerA = new BlockPos(cornerA.getX()-range, cornerA.getY()-range, cornerA.getZ()-range);
 
                 List<MobEntity> mobs = level.getNearbyEntities(MobEntity.class, EntityPredicate.DEFAULT, player, new AxisAlignedBB(cornerA, cornerB));
 
                 for(MobEntity mob : mobs){
-                    if (EnchantmentHelper.getFireAspect(player) > 0)
+                    if (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.IGNITE.get(), (LivingEntity) player) > 0)
                         mob.setSecondsOnFire(10);
-                    level.explode(player, mob.getX(), mob.getY(), mob.getZ(), 1, Explosion.Mode.DESTROY);
+                    if (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.EXPLODE.get(), (LivingEntity) player) > 0)
+                        level.explode(player, mob.getX(), mob.getY(), mob.getZ(), 1, Explosion.Mode.DESTROY);
+                    if (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.LEVITATE.get(), (LivingEntity) player) > 0)
+                        mob.addEffect(new EffectInstance(Effects.LEVITATION, 200));
+                    if (EnchantmentHelper.getEnchantmentLevel(EnchantmentInit.SLOWNESS.get(), (LivingEntity) player) > 0)
+                        mob.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 200));
                 }
             }
         }
     }
 
+    /** Instantiates the sound object **/
     private void instantiateSound()
     {
         if (sound == null)

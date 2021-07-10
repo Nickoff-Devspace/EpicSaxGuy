@@ -1,3 +1,10 @@
 {
-  "item.epicsaxguy.epicsax" : "Epic Sax"
+  "item.epicsaxguy.epicsax" : "Epic Sax",
+
+  "enchantment.epicsaxguy.explode_enchantment" : "Explode",
+  "enchantment.epicsaxguy.levitate_enchantment" : "Levitate",
+  "enchantment.epicsaxguy.ignite_enchantment" : "Ignite",
+  "enchantment.epicsaxguy.slowness_enchantment" : "Slowness",
+  "enchantment.epicsaxguy.range_enchantment" : "Range",
+  "enchantment.epicsaxguy.mega_range_enchantment" : "Mega Range"
 }

@@ -4,3 +4,5 @@
     skeleton with a config specified probability. keys:
         - AbstractSkeletonEntity: performRangedAttack
 [] Make an else clause into the bow file in order to allow ai to shoot it
+
+[] Nether star increases its range to 150
