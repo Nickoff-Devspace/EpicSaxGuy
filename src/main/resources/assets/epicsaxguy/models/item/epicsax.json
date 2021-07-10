@@ -1,0 +1,81 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "epicsaxguy:item/sax_gold",
+		"particle": "epicsaxguy:item/sax_gold"
+	},
+	"overrides": [
+		{
+			"predicate": {
+				"epicsaxguy:loading": 0
+			},
+			"model": "epicsaxguy:item/epicsax_loading_0"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 1
+			},
+			"model": "epicsaxguy:item/epicsax_loading_1"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 2
+			},
+			"model": "epicsaxguy:item/epicsax_loading_2"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 3
+			},
+			"model": "epicsaxguy:item/epicsax_loading_3"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 4
+			},
+			"model": "epicsaxguy:item/epicsax_loading_4"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 5
+			},
+			"model": "epicsaxguy:item/epicsax_loading_5"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 6
+			},
+			"model": "epicsaxguy:item/epicsax_loading_6"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 7
+			},
+			"model": "epicsaxguy:item/epicsax_loading_7"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 8
+			},
+			"model": "epicsaxguy:item/epicsax_loading_8"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 9
+			},
+			"model": "epicsaxguy:item/epicsax_loading_9"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 10
+			},
+			"model": "epicsaxguy:item/epicsax_loading_10"
+		},
+		{
+			"predicate": {
+				"epicsaxguy:loading": 11
+			},
+			"model": "epicsaxguy:item/epicsax_loading_11"
+		}
+	]
+}

@@ -1,0 +1,11 @@
+{
+  "item.epic_sax_sound" : {
+    "category" : "item",
+    "sounds" : [
+      {
+        "name" : "epicsaxguy:item/epic_sax_sound",
+        "stream" : true
+      }
+    ]
+  }
+}
