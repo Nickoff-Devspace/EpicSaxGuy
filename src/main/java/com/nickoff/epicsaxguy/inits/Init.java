@@ -31,6 +31,7 @@ public class Init {
         SOUNDS.register(ebus);
         ENCHANTMENTS.register(ebus);
         HandlerInit.register();
+        NetworkInit.register();
     }
 
     /** Register post artifacts, such as animations **/

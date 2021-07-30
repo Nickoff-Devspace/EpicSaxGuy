@@ -8,11 +8,12 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+/**
+ * Tickable sound for playing the sax sound in loop
+ * **/
 @OnlyIn(Dist.CLIENT)
 public class SaxSound extends TickableSound {
 
@@ -23,8 +24,13 @@ public class SaxSound extends TickableSound {
         super(SoundInit.EPIC_SAX_SOUND.get(), SoundCategory.PLAYERS);
         this.client = Minecraft.getInstance().player;
         this.holder = holder;
+        this.looping = true;
     }
 
+    /**
+     * Checks if the client distance to a playing sax sound is greater than its range
+     * Also, stops the song if the player dropped it, was died or just changed the main hand item
+     * */
     @Override
     public void tick() {
         ItemStack stack = holder.getMainHandItem();
@@ -35,6 +41,8 @@ public class SaxSound extends TickableSound {
                 this.volume = (float) (1.0 - distance / max_distance);
             else
                 this.volume = 0.0f;
+        } else {
+            Minecraft.getInstance().getSoundManager().stop(this);
         }
     }
 }

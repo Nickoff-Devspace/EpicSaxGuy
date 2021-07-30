@@ -1,6 +1,8 @@
 package com.nickoff.epicsaxguy.items;
 
 import com.nickoff.epicsaxguy.inits.EnchantmentInit;
+import com.nickoff.epicsaxguy.inits.NetworkInit;
+import com.nickoff.epicsaxguy.networking.SaxUseToClient;
 import com.nickoff.epicsaxguy.sounds.SaxSound;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.TickableSound;
@@ -24,51 +26,37 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.PacketDistributor;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-@OnlyIn(Dist.CLIENT)
 class SaxClientData
 {
-    private long lastTick;
     private int step;
-    private SaxSound song;
+    private long lastTick;
 
-    public SaxClientData(PlayerEntity holder)
+    public SaxClientData()
     {
         this.step = 0;
-        this.song = new SaxSound(holder);
         this.lastTick = 0L;
-    }
-
-    public long getLastTick() {
-        return lastTick;
-    }
-
-    public void setLastTick(long lastTick) {
-        this.lastTick = lastTick;
     }
 
     public int getStep() {
         return step;
     }
-
     public void setStep(int step) {
         this.step = step;
     }
-
-    public SaxSound getSong() {
-        return song;
-    }
-
-    public void setSong(SaxSound song) {
-        this.song = song;
-    }
+    public long getLastTick() { return lastTick; }
+    public void setLastTick(long lastTick) { this.lastTick = lastTick; }
 }
 
 class SaxServerData
 {
+    private boolean lastMessage;
     private long lastTick;
     private int step;
 
@@ -78,18 +66,21 @@ class SaxServerData
         this.step = 0;
     }
 
+    public boolean getLastMessage() {
+        return lastMessage;
+    }
+    public void setLastMessage(boolean updated) {
+        this.lastMessage = updated;
+    }
     public long getLastTick() {
         return lastTick;
     }
-
     public void setLastTick(long lastTick) {
         this.lastTick = lastTick;
     }
-
     public int getStep() {
         return step;
     }
-
     public void setStep(int step) {
         this.step = step;
     }
@@ -101,8 +92,10 @@ public class EpicSaxItem extends Item {
     private static final int USE_ANIM_START = 12;
     private static final int MAX_STEPS = 20;
 
-    private static final Map<Integer, SaxClientData> clientData = new HashMap<>();
-    private static final Map<Integer, SaxServerData> serverData = new HashMap<>();
+    private static Map<UUID, SaxSound> sounds = new HashMap<>();
+    private static SaxClientData clientData = new SaxClientData();
+
+    private static final Map<UUID, SaxServerData> serverData = new HashMap<>();
 
     private static final int defaultRange = 3;
 
@@ -125,10 +118,7 @@ public class EpicSaxItem extends Item {
      * **/
     private void handleClientSaxData(World level, PlayerEntity player)
     {
-        if (!clientData.containsKey(player.getId()))
-            clientData.put(player.getId(), new SaxClientData(player));
-        SaxClientData sdata = clientData.get(player.getId());
-        sdata.setLastTick(level.getGameTime());
+        clientData.setLastTick(level.getGameTime());
     }
 
     /** If not exists, generate server data for a saxophonist, and/or sets its last tick
@@ -137,9 +127,9 @@ public class EpicSaxItem extends Item {
      * **/
     private void handleServerSaxData(World level, PlayerEntity player)
     {
-        if(!serverData.containsKey(player.getId()))
-            serverData.put(player.getId(), new SaxServerData());
-        SaxServerData sdata = serverData.get(player.getId());
+        if(!serverData.containsKey(player.getUUID()))
+            serverData.put(player.getUUID(), new SaxServerData());
+        SaxServerData sdata = serverData.get(player.getUUID());
         sdata.setLastTick(level.getGameTime());
     }
 
@@ -148,8 +138,13 @@ public class EpicSaxItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World level, Entity player, int ticks, boolean p_77663_5_) {
         if (player instanceof PlayerEntity &&
-                (clientData.containsKey(player.getId()) || serverData.containsKey(player.getId())))
-            nextStep(stack, level, (PlayerEntity) player);
+           ((PlayerEntity) player).getMainHandItem() == stack)
+        {
+            if (level.isClientSide())
+                clientNextStep(stack, level, (PlayerEntity) player);
+            else if (serverData.containsKey(player.getUUID()))
+                serverNextStep(stack, level, (PlayerEntity) player);
+        }
 
         super.inventoryTick(stack, level, player, ticks, p_77663_5_);
     }
@@ -165,27 +160,48 @@ public class EpicSaxItem extends Item {
      * @param level the world the player is in
      * @param player the player is holding the sax
      * **/
-    private void nextStep(ItemStack stack, World level, PlayerEntity player)
+    private void clientNextStep(ItemStack stack, World level, PlayerEntity player)
     {
-        if (level.isClientSide())
-        {
-            SaxClientData sdata = clientData.get(player.getId());
-            int step = calculateNextStep(sdata.getStep(), sdata.getLastTick(), level.getGameTime());
-            sdata.setStep(step);
-            if (step > STEPS_UNTIL_USE)
-                clientUseSax(level, player, stack);
-            else if (step == 0)
-                clientUnuseSax(level, player, stack);
+        int step = calculateNextStep(clientData.getStep(), clientData.getLastTick(), level.getGameTime());
+        clientData.setStep(step);
+        if (step > STEPS_UNTIL_USE)
+            clientUseSax(level, player, stack);
+        else if (step == 0)
+            clientUnuseSax(level, player, stack);
+    }
+
+    /** Loads a sax server and starts its killing procedure if loaded
+     * @param stack the sax stack
+     * @param level the world the player is in
+     * @param player the player is holding the sax
+     * **/
+    private void serverNextStep(ItemStack stack, World level, PlayerEntity player)
+    {
+        SaxServerData sdata = serverData.get(player.getUUID());
+        int step = calculateNextStep(sdata.getStep(), sdata.getLastTick(), level.getGameTime());
+        sdata.setStep(step);
+        if (step > STEPS_UNTIL_USE) {
+            serverUseSax(level, player, stack);
+            sendUseMessageToClients(true, player);
         }
-        else
+        else if (step == 0)
         {
-            SaxServerData sdata = serverData.get(player.getId());
-            int step = calculateNextStep(sdata.getStep(), sdata.getLastTick(), level.getGameTime());
-            sdata.setStep(step);
-            if (step > STEPS_UNTIL_USE)
-                serverUseSax(level, player, stack);
-            else if (step == 0)
-                serverUnuseSax(level, player, stack);
+            sendUseMessageToClients(false, player);
+            serverUnuseSax(level, player, stack);
+        }
+    }
+
+    /** Sends message from server to client to notify clients of a sax usage
+     * @param using a flag indicating whether the player is using the sax
+     * @param player the player is using the sax
+     * **/
+    private void sendUseMessageToClients(boolean using, PlayerEntity player)
+    {
+        SaxServerData sdata = serverData.get(player.getUUID());
+        if (using != sdata.getLastMessage()) {
+            NetworkInit.simpleChannel.send(PacketDistributor.ALL.noArg(),
+                    new SaxUseToClient(using, player.getUUID()));
+            sdata.setLastMessage(using);
         }
     }
 
@@ -220,17 +236,15 @@ public class EpicSaxItem extends Item {
      * **/
     private void clientUseSax(World level, PlayerEntity player, ItemStack stack)
     {
-        if (level.isClientSide())
-            playSound(player);
     }
 
     /** Plays the sax song in a player's poisiton
      * @param holder the player who just use the sax
      * **/
     @OnlyIn(Dist.CLIENT)
-    private void playSound(PlayerEntity holder)
+    private static void playSound(UUID holder)
     {
-        TickableSound sound = clientData.get(holder.getId()).getSong();
+        TickableSound sound = sounds.get(holder);
         if (!Minecraft.getInstance().getSoundManager().isActive(sound))
             Minecraft.getInstance().getSoundManager().play(sound);
     }
@@ -242,17 +256,15 @@ public class EpicSaxItem extends Item {
      * **/
     private void clientUnuseSax(World level, PlayerEntity player, ItemStack stack)
     {
-        stopSound(player);
-        SaxClientData sdata = clientData.get(player.getId());
-        sdata.setStep(0);
+        clientData.setStep(0);
     }
 
     /** Stops the sax song of a player who is using a sax
      * @param holder the player who stopped using a sax
      * **/
     @OnlyIn(Dist.CLIENT)
-    private void stopSound(PlayerEntity holder) {
-        TickableSound sound = clientData.get(holder.getId()).getSong();
+    private static void stopSound(UUID holder) {
+        TickableSound sound = sounds.get(holder);
         if (Minecraft.getInstance().getSoundManager().isActive(sound))
             Minecraft.getInstance().getSoundManager().stop(sound);
     }
@@ -305,7 +317,7 @@ public class EpicSaxItem extends Item {
      * **/
     private void serverUnuseSax(World level, PlayerEntity player, ItemStack stack)
     {
-        SaxServerData sdata = serverData.get(player.getId());
+        SaxServerData sdata = serverData.get(player.getUUID());
         sdata.setStep(0);
     }
 
@@ -314,8 +326,26 @@ public class EpicSaxItem extends Item {
      * **/
     public static int getAnimStep(PlayerEntity player)
     {
-        if (clientData.containsKey(player.getId()))
-            return clientData.get(player.getId()).getStep();
+        if (player == Minecraft.getInstance().player)
+            return clientData.getStep();
         return 0;
     }
+
+    /** Makes a player to start listening to a song when the server alerts it
+     * of sax using
+     * @param playerId the UUID of the player
+     * @param using sets the UUID of the player
+     * **/
+    public static void setPlayerUsing(UUID playerId, boolean using)
+    {
+        PlayerEntity player = Minecraft.getInstance().level.getPlayerByUUID(playerId);
+
+        if (sounds.containsKey(playerId))
+            stopSound(playerId);
+        sounds.put(playerId, new SaxSound(player));
+
+        if (using)
+            playSound(playerId);
+    }
+
 }
